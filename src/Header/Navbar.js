@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { FaBars, FaTimes } from "react-icons/fa"
 import Navlinks from "./Navlinks"
-import Logo from "../Image/logo.jpg"
+import Logo from "../Image/logo-1.jpg"
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
