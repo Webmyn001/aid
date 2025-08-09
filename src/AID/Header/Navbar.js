@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FiMenu, FiX } from 'react-icons/fi';
 import { motion } from 'framer-motion';
-import Logo from '../Image/logo.jpg';
+import Logo from '../Image/logo-1.jpg';
 
 const NavItem = ({ to, children, className }) => {
   const location = useLocation();
