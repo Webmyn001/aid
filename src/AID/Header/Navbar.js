@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FiMenu, FiX } from 'react-icons/fi';
 import { motion } from 'framer-motion';
-import Logo from '../Image/logo-1.jpg';
+import Logo from '../Image/AID-Logo.jpeg';
 
 const NavItem = ({ to, children, className }) => {
   const location = useLocation();
@@ -48,7 +48,7 @@ function Navbar() {
       {/* Top Info Bar */}
       <div className="bg-[#99010e] text-white py-2 px-4 text-sm">
         <div className="max-w-7xl mx-auto font-Outfit flex justify-between items-center">
-          <span>AYOOLA INTERIOR DESIGNS LTD</span>
+          <span>AID Concepts</span>
           <span className='font-Playwrite'>RC Number: 81107020</span>
         </div>
       </div>

@@ -4,7 +4,7 @@ import { IoLogoWhatsapp } from 'react-icons/io'
 import { AiOutlineMail } from 'react-icons/ai'
 import Login from './Login'
 import Signup from './Signup'
-import Avatar from '../Image/logo.jpg'
+import Avatar from '../Image/AID-Logo.jpeg'
 import AOS from "aos"
 import "aos/dist/aos.css"
 
