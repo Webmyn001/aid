@@ -88,7 +88,7 @@ export default function Dashboard() {
     <div className="min-h-screen font-Poppins bg-gradient-to-br from-gray-50 to-blue-50 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <header className="mb-8 pt-[100px]">
-          <h1 className="text-3xl md:text-4xl  font-bold bg-gradient-to-r from-[#99010e] to-[#d64955] bg-clip-text text-transparent">
+          <h1 className="text-3xl md:text-4xl  font-bold bg-gradient-to-r from-[#d2ab66] to-[#f3e1b9] bg-clip-text text-transparent">
             Dashboard
           </h1>
         
@@ -96,7 +96,7 @@ export default function Dashboard() {
          {/* Logout Button */}
          <button 
       onClick={handleLogout}
-      className="flex items-center mt-2 gap-2 bg-[#99010e] hover:bg-[#d64955] text-white px-4 py-2.5 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+      className="flex items-center mt-2 gap-2 bg-[#d2ab66] hover:bg-[#f3e1b9] text-white px-4 py-2.5 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
     >
       <FiLogOut className="w-5 h-5 animate-pulse" />
       <span className="font-medium">Sign Out</span>
@@ -108,7 +108,7 @@ export default function Dashboard() {
           {/* Messages Panel */}
           <section className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
             <div className="flex items-center gap-3 mb-6">
-              <FiMessageSquare className="w-6 h-6 text-[#99010e]" />
+              <FiMessageSquare className="w-6 h-6 text-[#d2ab66]" />
               <h2 className="text-xl font-semibold text-gray-800">Client Messages</h2>
             </div>
             
@@ -121,7 +121,7 @@ export default function Dashboard() {
                   <div className="flex justify-between items-start mb-2">
                     <div>
                       <h3 className="font-semibold text-gray-800">{msg.Name}</h3>
-                      <a href={`mailto:${msg.Email}`} className="text-sm text-[#99010e] hover:underline">
+                      <a href={`mailto:${msg.Email}`} className="text-sm text-[#d2ab66] hover:underline">
                         {msg.Email}
                       </a>
                     </div>
@@ -146,7 +146,7 @@ export default function Dashboard() {
           {/* Upload Panel */}
           <section className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
             <div className="flex items-center gap-3 mb-6">
-              <FiUploadCloud className="w-6 h-6 text-[#99010e]" />
+              <FiUploadCloud className="w-6 h-6 text-[#d2ab66]" />
               <h2 className="text-xl font-semibold text-gray-800">Upload Works</h2>
             </div>
 
@@ -160,7 +160,7 @@ export default function Dashboard() {
                     type={field === 'price' ? 'text' : 'text'}
                     value={formData[field]}
                     onChange={(e) => setFormData(prev => ({ ...prev, [field]: e.target.value }))}
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-[#99010e] focus:border-transparent transition-all"
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-[#d2ab66] focus:border-transparent transition-all"
                     placeholder={
                       field === 'image' ? 'Paste image URL...' 
                       : field === 'price' ? '#0.00' 
@@ -174,7 +174,7 @@ export default function Dashboard() {
               <button 
                 type="submit" 
                 disabled={loading}
-                className="w-full bg-[#99010e] text-white py-3 px-6 rounded-lg font-medium hover:bg-[#7a010b] disabled:opacity-70 transition-all flex items-center justify-center gap-2"
+                className="w-full bg-[#d2ab66] text-white py-3 px-6 rounded-lg font-medium hover:bg-[#0a0a0a] disabled:opacity-70 transition-all flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <Oval height={24} width={24} color="#fff" />
@@ -195,7 +195,7 @@ export default function Dashboard() {
                     className="h-48 w-full object-cover rounded-lg mb-3"
                   />
                   <h4 className="font-medium text-gray-800 truncate">{formData.title}</h4>
-                  <p className="text-[#99010e] font-medium">{formData.price}</p>
+                  <p className="text-[#d2ab66] font-medium">{formData.price}</p>
                 </div>
               </div>
             )}
@@ -235,7 +235,7 @@ export default function Dashboard() {
                       <FiTrash2 className="w-5 h-5" />
                     </button>
                   </div>
-                  <p className="text-[#99010e] font-medium">{work.price}</p>
+                  <p className="text-[#d2ab66] font-medium">{work.price}</p>
                 </div>
               </article>
             ))}

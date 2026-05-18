@@ -6,7 +6,6 @@ import './App.css';
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import Contact from './AID/Contact';
 import Works from './AID/Works';
-import Auth from './AID/Auth.js/Auth';
 import Service from './AID/Service';
 import Home from './AID/Home';
 import Certifications from './AID/Certifications';
@@ -25,7 +24,10 @@ import Garden from './AID/Information/Garden';
 import Clean from './AID/Information/Clean';
 import Wall from './AID/Information/Wall';
 
-import Dashboard from './AID/Dashboard';
+import AdminSecure from './AID/AdminSecure';
+import BlogList from './AID/BlogList';
+import BlogDetail from './AID/BlogDetail';
+import WhatsAppButton from './AID/WhatsAppButton';
 import Unauthorized404 from './AID/Unauthorized404';
 
 
@@ -36,6 +38,7 @@ function App() {
    <div className=" bg-repeat object-cover bg-[url('./AID/Image/background-design.jpg')]" >
     <Router>
        <Navbar/>
+       <WhatsAppButton />
     <Routes>
     <Route path = "/" exact element= {<Home/>}></Route>
        <Route path = "/contact" exact element= {<Contact/>}></Route>
@@ -61,18 +64,15 @@ function App() {
       
       
 
-
-      {/* Dash Board */}
-      <Route path = "/Dashboard" exact element= {<Dashboard/>}></Route>
-      
-
-        
+      {/* Admin Portal & Blog */}
+      <Route path = "/aid-admin-secure" exact element= {<AdminSecure/>}></Route>
+      <Route path = "/blog" exact element= {<BlogList/>}></Route>
+      <Route path = "/blog/:id" exact element= {<BlogDetail/>}></Route>
 
        <Route path = "/cert" exact element= {<Certifications/>}></Route>
-       <Route path = "/login" exact element= {<Auth/>}></Route>
 
 
-       {/* Error */}
+        {/* Error */}
  <Route path = "/error" exact element= {<Unauthorized404/>}></Route>
 
 

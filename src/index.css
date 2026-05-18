@@ -11,4 +11,11 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  font-family: 'Outfit', sans-serif;
+  background-color: #ffffff;
+  color: #333333;
+}
+
+
 

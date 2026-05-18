@@ -46,7 +46,7 @@ const Auth = () => {
             <img 
               src={Avatar} 
               alt="Company Logo" 
-              className="w-20 h-20 rounded-full object-cover border-4 border-[#99010e] transition-transform duration-500 hover:scale-110"
+              className="w-20 h-20 rounded-full object-cover border-4 border-[#d2ab66] transition-transform duration-500 hover:scale-110"
             />
             <h1 className="text-2xl font-bold text-gray-800">Welcome to AID</h1>
           </div>
@@ -59,7 +59,7 @@ const Auth = () => {
                 onClick={() => setAuthType(type)}
                 className={`flex-1 py-3 px-6 rounded-full text-sm font-medium transition-all duration-300 ${
                   authType === type 
-                    ? 'bg-[#99010e] text-white shadow-md'
+                    ? 'bg-[#d2ab66] text-white shadow-md'
                     : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
@@ -81,7 +81,7 @@ const Auth = () => {
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 rounded-full bg-gray-100 hover:bg-[#99010e] transition-all duration-300 group"
+                className="p-2 rounded-full bg-gray-100 hover:bg-[#d2ab66] transition-all duration-300 group"
                 aria-label={link.label}
               >
                 {React.cloneElement(link.icon, {
