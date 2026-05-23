@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, Link } from 'react-router-dom';
-import { FaCalendarAlt, FaTag, FaArrowLeft, FaClock, FaEye, FaThumbsUp } from 'react-icons/fa';
+import { 
+  FaCalendarAlt, FaTag, FaArrowLeft, FaClock, FaEye, FaThumbsUp, 
+  FaShareAlt, FaWhatsapp, FaTwitter, FaFacebookF, FaLinkedinIn, FaCopy, FaCheck 
+} from 'react-icons/fa';
 import { MOCK_BLOGS } from './BlogList';
 
 const API_BASE = 'http://localhost:5000/api';
@@ -11,6 +14,15 @@ function BlogDetail() {
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  const shareUrl = `${API_BASE}/blogs/share/${id}`;
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(shareUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   useEffect(() => {
     fetchBlog();
@@ -77,9 +89,13 @@ function BlogDetail() {
         <div className="space-y-4">
           <div className="flex flex-wrap gap-2 items-center">
             {blog.categories.map((c, idx) => (
-              <span key={idx} className="flex items-center gap-1 bg-[#d2ab66]/5 text-[#d2ab66] font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wider">
+              <Link
+                key={idx}
+                to={`/blog?category=${encodeURIComponent(c)}`}
+                className="flex items-center gap-1 bg-[#d2ab66]/5 hover:bg-[#d2ab66]/15 text-[#d2ab66] font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wider transition-all"
+              >
                 <FaTag size={10} /> {c}
-              </span>
+              </Link>
             ))}
           </div>
           <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 leading-tight">
@@ -110,7 +126,7 @@ function BlogDetail() {
               {blog.likes || 0} likes
             </span>
             <span className="hidden sm:inline">•</span>
-            <span className="uppercase tracking-widest text-[10px] font-bold text-gray-400">By {blog.author || 'Admin'}</span>
+            <span className="uppercase tracking-widest text-[10px] font-bold text-gray-400">By {blog.byName || 'Admin'}</span>
           </div>
         </div>
 
@@ -124,8 +140,11 @@ function BlogDetail() {
         </div>
 
         {/* Blog Content Flow */}
-        <article className="prose prose-lg max-w-none text-gray-700 font-light leading-relaxed whitespace-pre-line bg-gray-50/50 p-6 md:p-10 rounded-3xl border border-gray-100 shadow-sm">
-          <div>{blog.content}</div>
+        <article className="prose prose-lg max-w-none text-gray-700 font-light leading-relaxed bg-gray-50/50 p-6 md:p-10 rounded-3xl border border-gray-100 shadow-sm space-y-6">
+          {blog.descriptionTitle && (
+            <p className="text-lg text-[#d2ab66] font-semibold italic">{blog.descriptionTitle}</p>
+          )}
+          <div dangerouslySetInnerHTML={{ __html: blog.description }} />
 
           {/* Optional Additional Image Showcase */}
           {blog.additionalImage && (
@@ -137,7 +156,99 @@ function BlogDetail() {
               />
             </div>
           )}
+
+          {/* Tags Section */}
+          {blog.tags && blog.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 items-center pt-6 border-t border-gray-100">
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Tags:</span>
+              {blog.tags.map((t, idx) => (
+                <Link
+                  key={idx}
+                  to={`/blog?tag=${encodeURIComponent(t)}`}
+                  className="bg-white hover:bg-[#d2ab66]/10 hover:text-[#d2ab66] text-gray-600 text-xs font-medium px-3 py-1.5 rounded-full border border-gray-200 hover:border-[#d2ab66]/30 transition-all cursor-pointer"
+                >
+                  #{t}
+                </Link>
+              ))}
+            </div>
+          )}
         </article>
+
+        {/* Share Section */}
+        <div className="bg-gray-50/80 p-6 md:p-8 rounded-3xl border border-[#d2ab66]/10 flex flex-col sm:flex-row sm:items-center justify-between gap-6 shadow-sm">
+          <div className="space-y-1">
+            <h4 className="font-bold text-gray-900 text-lg flex items-center gap-2">
+              <FaShareAlt className="text-[#d2ab66]" /> Share this Article
+            </h4>
+            <p className="text-gray-500 text-sm font-light">Share this editorial design insight with your social circles.</p>
+          </div>
+          
+          <div className="flex flex-wrap gap-2.5 items-center">
+            {/* WhatsApp */}
+            <a
+              href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out this article: "${blog.title}"\n${shareUrl}`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-10 h-10 rounded-full bg-white hover:bg-emerald-500 text-[#d2ab66] hover:text-white border border-[#d2ab66]/20 flex justify-center items-center transition-all duration-300 shadow-sm cursor-pointer"
+              title="Share on WhatsApp"
+            >
+              <FaWhatsapp size={18} />
+            </a>
+
+            {/* Twitter / X */}
+            <a
+              href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(`Check out this article: "${blog.title}"`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-10 h-10 rounded-full bg-white hover:bg-black text-[#d2ab66] hover:text-white border border-[#d2ab66]/20 flex justify-center items-center transition-all duration-300 shadow-sm cursor-pointer"
+              title="Share on X (Twitter)"
+            >
+              <FaTwitter size={16} />
+            </a>
+
+            {/* Facebook */}
+            <a
+              href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-10 h-10 rounded-full bg-white hover:bg-blue-600 text-[#d2ab66] hover:text-white border border-[#d2ab66]/20 flex justify-center items-center transition-all duration-300 shadow-sm cursor-pointer"
+              title="Share on Facebook"
+            >
+              <FaFacebookF size={16} />
+            </a>
+
+            {/* LinkedIn */}
+            <a
+              href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-10 h-10 rounded-full bg-white hover:bg-sky-700 text-[#d2ab66] hover:text-white border border-[#d2ab66]/20 flex justify-center items-center transition-all duration-300 shadow-sm cursor-pointer"
+              title="Share on LinkedIn"
+            >
+              <FaLinkedinIn size={16} />
+            </a>
+
+            {/* Copy Link Button */}
+            <button
+              onClick={handleCopyLink}
+              className={`h-10 px-4 rounded-full border flex items-center gap-1.5 text-xs font-bold transition-all duration-300 shadow-sm cursor-pointer ${
+                copied 
+                  ? 'bg-emerald-500 border-transparent text-white' 
+                  : 'bg-white border-[#d2ab66]/20 text-[#d2ab66] hover:bg-[#d2ab66]/10'
+              }`}
+            >
+              {copied ? (
+                <>
+                  <FaCheck size={12} /> Link Copied
+                </>
+              ) : (
+                <>
+                  <FaCopy size={12} /> Copy Share Link
+                </>
+              )}
+            </button>
+          </div>
+        </div>
 
         {/* Bottom CTA / Share Section */}
         <div className="border-t border-[#d2ab66]/20 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">

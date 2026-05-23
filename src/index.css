@@ -17,5 +17,34 @@ body {
   color: #333333;
 }
 
+.quill-wrapper .ql-container {
+  min-height: 300px;
+  font-size: 16px;
+  font-family: 'Outfit', sans-serif;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.quill-wrapper .ql-toolbar {
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  background: #f9f9f9;
+}
+
+.quill-wrapper .ql-editor {
+  min-height: 280px;
+}
+
+.quill-wrapper {
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  transition: border-color 0.2s;
+}
+
+.quill-wrapper:focus-within {
+  border-color: #b73034;
+  box-shadow: 0 0 0 2px rgba(183, 48, 52, 0.1);
+}
+
 
 
