@@ -3,7 +3,7 @@ import axios from 'axios';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import confetti from 'canvas-confetti';
-import { FaPlus, FaTrash, FaEdit, FaSignOutAlt, FaBlog, FaEnvelope, FaLock, FaImage, FaTag, FaUser, FaHeading, FaSearch, FaSpinner } from 'react-icons/fa';
+import { FaPlus, FaTrash, FaEdit, FaSignOutAlt, FaBlog, FaEnvelope, FaLock, FaImage, FaTag, FaUser, FaHeading, FaSearch, FaSpinner, FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const API_BASE = 'https://aidconcept.vercel.app/api';
 
@@ -32,6 +32,7 @@ function AdminSecure() {
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const [activeTab, setActiveTab] = useState('blogs');
   const [blogs, setBlogs] = useState([]);
@@ -302,14 +303,24 @@ function AdminSecure() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#d2ab66]/30 focus:border-[#d2ab66]"
-                  placeholder="••••••••"
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="appearance-none rounded-lg relative block w-full px-3 py-3 pr-11 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#d2ab66]/30 focus:border-[#d2ab66]"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-700 transition-colors"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+                  </button>
+                </div>
               </div>
             </div>
 
