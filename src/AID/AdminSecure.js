@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { FaPlus, FaTrash, FaEdit, FaSignOutAlt, FaBlog, FaEnvelope, FaLock, FaImage, FaTag, FaUser, FaHeading, FaSearch, FaTimes } from 'react-icons/fa';
+import confetti from 'canvas-confetti';
+import { FaPlus, FaTrash, FaEdit, FaSignOutAlt, FaBlog, FaEnvelope, FaLock, FaImage, FaTag, FaUser, FaHeading, FaSearch, FaSpinner } from 'react-icons/fa';
 
 const API_BASE = 'https://aidconcept.vercel.app/api';
 
@@ -30,6 +31,7 @@ function AdminSecure() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
+  const [loginLoading, setLoginLoading] = useState(false);
 
   const [activeTab, setActiveTab] = useState('blogs');
   const [blogs, setBlogs] = useState([]);
@@ -50,6 +52,31 @@ function AdminSecure() {
   const [additionalImagePreview, setAdditionalImagePreview] = useState('');
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [deletingId, setDeletingId] = useState('');
+
+  const fireConfetti = () => {
+    const duration = 2000;
+    const end = Date.now() + duration;
+    const frame = () => {
+      confetti({
+        particleCount: 3,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0, y: 0.6 },
+        colors: ['#d2ab66', '#0a0a0a', '#b73034', '#f3e1b9'],
+      });
+      confetti({
+        particleCount: 3,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1, y: 0.6 },
+        colors: ['#d2ab66', '#0a0a0a', '#b73034', '#f3e1b9'],
+      });
+      if (Date.now() < end) requestAnimationFrame(frame);
+    };
+    frame();
+  };
 
   useEffect(() => {
     if (token) {
@@ -84,6 +111,7 @@ function AdminSecure() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoginError('');
+    setLoginLoading(true);
     try {
       const res = await axios.post(`${API_BASE}/auth/login`, { email, password });
       if (res.data.success) {
@@ -93,6 +121,8 @@ function AdminSecure() {
       }
     } catch (err) {
       setLoginError(err.response?.data?.message || 'Authentication failed');
+    } finally {
+      setLoginLoading(false);
     }
   };
 
@@ -157,7 +187,7 @@ function AdminSecure() {
     }
 
     try {
-      setLoading(true);
+      setSubmitting(true);
       let res;
       if (isEditing) {
         res = await axios.put(`${API_BASE}/blogs/${editId}`, formData, {
@@ -177,13 +207,14 @@ function AdminSecure() {
 
       if (res.data.success) {
         setFormSuccess(isEditing ? 'Blog updated successfully!' : 'Blog created successfully!');
+        fireConfetti();
         resetBlogForm();
         fetchDashboardData();
       }
     } catch (err) {
       setFormError(err.response?.data?.message || 'Error processing request');
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
@@ -200,6 +231,7 @@ function AdminSecure() {
     setAdditionalImagePreview(blog.additionalImage || '');
     setBlogImage(null);
     setBlogAdditionalImage(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const resetBlogForm = () => {
@@ -221,7 +253,7 @@ function AdminSecure() {
     if (!window.confirm('Are you sure you want to delete this blog post?')) return;
 
     try {
-      setLoading(true);
+      setDeletingId(id);
       const res = await axios.delete(`${API_BASE}/blogs/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -231,7 +263,7 @@ function AdminSecure() {
     } catch (err) {
       alert('Error deleting post');
     } finally {
-      setLoading(false);
+      setDeletingId('');
     }
   };
 
@@ -284,9 +316,14 @@ function AdminSecure() {
             <div>
               <button
                 type="submit"
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-[#0a0a0a] hover:bg-[#d2ab66] hover:text-[#0a0a0a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#d2ab66] transition-all duration-300 shadow-md"
+                disabled={loginLoading}
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-[#0a0a0a] hover:bg-[#d2ab66] hover:text-[#0a0a0a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#d2ab66] transition-all duration-300 shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                Sign In
+                {loginLoading ? (
+                  <span className="flex items-center gap-2"><FaSpinner className="animate-spin" size={16} /> Signing In...</span>
+                ) : (
+                  'Sign In'
+                )}
               </button>
             </div>
           </form>
@@ -510,17 +547,22 @@ function AdminSecure() {
                       <button
                         type="button"
                         onClick={resetBlogForm}
-                        className="px-6 py-2.5 rounded-full border border-gray-300 font-semibold text-gray-600 hover:bg-gray-50 transition-all duration-300"
+                        disabled={submitting}
+                        className="px-6 py-2.5 rounded-full border border-gray-300 font-semibold text-gray-600 hover:bg-gray-50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         Cancel
                       </button>
                     )}
                     <button
                       type="submit"
-                      className="bg-[#0a0a0a] hover:bg-[#d2ab66] hover:text-[#0a0a0a] text-white px-8 py-2.5 rounded-full font-semibold transition-all duration-300 shadow-md flex items-center gap-2"
+                      disabled={submitting}
+                      className="bg-[#0a0a0a] hover:bg-[#d2ab66] hover:text-[#0a0a0a] text-white px-8 py-2.5 rounded-full font-semibold transition-all duration-300 shadow-md flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      {isEditing ? <FaEdit /> : <FaPlus />}
-                      {isEditing ? 'Update Article' : 'Publish Article'}
+                      {submitting ? (
+                        <span className="flex items-center gap-2"><FaSpinner className="animate-spin" size={16} /> {isEditing ? 'Updating...' : 'Publishing...'}</span>
+                      ) : (
+                        <><span>{isEditing ? <FaEdit /> : <FaPlus />}</span> {isEditing ? 'Update Article' : 'Publish Article'}</>
+                      )}
                     </button>
                   </div>
                 </form>
@@ -529,7 +571,11 @@ function AdminSecure() {
               <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
                 <h2 className="text-xl font-bold text-gray-900 mb-6 pb-3 border-b border-gray-100">Published Articles</h2>
 
-                {blogs.length === 0 ? (
+                {loading ? (
+                  <div className="flex justify-center items-center py-16">
+                    <FaSpinner className="animate-spin text-[#d2ab66]" size={32} />
+                  </div>
+                ) : blogs.length === 0 ? (
                   <div className="text-center py-12 bg-[#fafafa] rounded-2xl border border-dashed border-gray-200">
                     <FaBlog className="mx-auto text-4xl text-gray-300 mb-3" />
                     <span className="block font-medium text-gray-600">No blog posts found</span>
@@ -566,17 +612,23 @@ function AdminSecure() {
                               <div className="flex justify-end gap-2">
                                 <button
                                   onClick={() => handleEditInit(blog)}
-                                  className="p-2.5 text-[#d2ab66] hover:bg-[#d2ab66]/10 rounded-full transition-colors"
+                                  disabled={deletingId === blog._id}
+                                  className="p-2.5 text-[#d2ab66] hover:bg-[#d2ab66]/10 rounded-full transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                                   title="Edit Post"
                                 >
                                   <FaEdit size={16} />
                                 </button>
                                 <button
                                   onClick={() => handleDeleteBlog(blog._id)}
-                                  className="p-2.5 text-[#b73034] hover:bg-[#b73034]/10 rounded-full transition-colors"
+                                  disabled={deletingId === blog._id}
+                                  className="p-2.5 text-[#b73034] hover:bg-[#b73034]/10 rounded-full transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                                   title="Delete Post"
                                 >
-                                  <FaTrash size={16} />
+                                  {deletingId === blog._id ? (
+                                    <FaSpinner className="animate-spin" size={16} />
+                                  ) : (
+                                    <FaTrash size={16} />
+                                  )}
                                 </button>
                               </div>
                             </td>
@@ -592,7 +644,11 @@ function AdminSecure() {
             <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
               <h2 className="text-xl font-bold text-gray-900 mb-6 pb-3 border-b border-gray-100">Client Contact Inquiries</h2>
 
-              {inquiries.length === 0 ? (
+              {loading ? (
+                <div className="flex justify-center items-center py-16">
+                  <FaSpinner className="animate-spin text-[#d2ab66]" size={32} />
+                </div>
+              ) : inquiries.length === 0 ? (
                 <div className="text-center py-12 bg-[#fafafa] rounded-2xl border border-dashed border-gray-200">
                   <FaEnvelope className="mx-auto text-4xl text-gray-300 mb-3" />
                   <span className="block font-medium text-gray-600">No contact inquiries yet</span>
