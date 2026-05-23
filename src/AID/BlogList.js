@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FaCalendarAlt, FaTag, FaArrowRight, FaClock, FaSearch, FaTimes } from 'react-icons/fa';
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = 'https://aidconcept.vercel.app/api';
 
 const MOCK_BLOGS = [
   {

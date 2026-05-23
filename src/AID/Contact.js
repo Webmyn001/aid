@@ -26,7 +26,7 @@ function Contact() {
     setLoading(true)
     
     try {
-      await axios.post("http://localhost:5000/api/contact", {
+      await axios.post("https://aidconcept.vercel.app/api/contact", {
         name: formData.Name,
         email: formData.Email,
         message: formData.Message,

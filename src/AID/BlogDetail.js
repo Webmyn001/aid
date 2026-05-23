@@ -7,7 +7,7 @@ import {
 } from 'react-icons/fa';
 import { MOCK_BLOGS } from './BlogList';
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = 'https://aidconcept.vercel.app/api';
 
 function BlogDetail() {
   const { id } = useParams();
