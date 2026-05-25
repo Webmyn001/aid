@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import confetti from 'canvas-confetti';
-import { FaPlus, FaTrash, FaEdit, FaSignOutAlt, FaBlog, FaEnvelope, FaLock, FaImage, FaTag, FaUser, FaHeading, FaSearch, FaSpinner, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { FaPlus, FaTrash, FaEdit, FaSignOutAlt, FaBlog, FaEnvelope, FaLock, FaImage, FaTag, FaUser, FaHeading, FaSearch, FaSpinner, FaEye, FaEyeSlash, FaChartBar, FaThumbsUp } from 'react-icons/fa';
 
 const API_BASE = 'https://aidconcept.vercel.app/api';
 
@@ -27,12 +28,15 @@ const quillFormats = [
 ];
 
 function AdminSecure() {
-  const [token, setToken] = useState(localStorage.getItem('adminToken') || '');
+  const [token, setToken] = useState(
+    localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken') || ''
+  );
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
 
   const [activeTab, setActiveTab] = useState('blogs');
   const [blogs, setBlogs] = useState([]);
@@ -55,6 +59,17 @@ function AdminSecure() {
   const [formSuccess, setFormSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState('');
+
+  const analytics = useMemo(() => {
+    const totalViews = blogs.reduce((sum, b) => sum + (b.views || 0), 0);
+    const totalLikes = blogs.reduce((sum, b) => sum + (b.likes || 0), 0);
+    const chartData = blogs.map(b => ({
+      title: b.title.length > 22 ? b.title.substring(0, 22) + '...' : b.title,
+      views: b.views || 0,
+      likes: b.likes || 0,
+    })).sort((a, b) => b.views - a.views);
+    return { totalViews, totalLikes, chartData };
+  }, [blogs]);
 
   const fireConfetti = () => {
     const duration = 2000;
@@ -117,7 +132,13 @@ function AdminSecure() {
       const res = await axios.post(`${API_BASE}/auth/login`, { email, password });
       if (res.data.success) {
         const adminToken = res.data.token;
-        localStorage.setItem('adminToken', adminToken);
+        if (rememberMe) {
+          localStorage.setItem('adminToken', adminToken);
+          sessionStorage.removeItem('adminToken');
+        } else {
+          sessionStorage.setItem('adminToken', adminToken);
+          localStorage.removeItem('adminToken');
+        }
         setToken(adminToken);
       }
     } catch (err) {
@@ -129,6 +150,7 @@ function AdminSecure() {
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
+    sessionStorage.removeItem('adminToken');
     setToken('');
     setBlogs([]);
     setInquiries([]);
@@ -232,6 +254,7 @@ function AdminSecure() {
     setAdditionalImagePreview(blog.additionalImage || '');
     setBlogImage(null);
     setBlogAdditionalImage(null);
+    setActiveTab('blogs');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -324,6 +347,19 @@ function AdminSecure() {
               </div>
             </div>
 
+            <div className="flex items-center">
+              <input
+                id="remember-me"
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-[#d2ab66] focus:ring-[#d2ab66] cursor-pointer"
+              />
+              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-600 cursor-pointer select-none">
+                Remember me
+              </label>
+            </div>
+
             <div>
               <button
                 type="submit"
@@ -361,7 +397,7 @@ function AdminSecure() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <div className="lg:col-span-1 bg-white p-4 rounded-2xl shadow-sm border border-gray-100 h-fit space-y-2">
           <button
-            onClick={() => setActiveTab('blogs')}
+            onClick={() => { setActiveTab('blogs'); resetBlogForm(); }}
             className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl font-semibold transition-all duration-300 ${
               activeTab === 'blogs'
                 ? 'bg-[#d2ab66] text-[#0a0a0a] shadow-md'
@@ -369,6 +405,16 @@ function AdminSecure() {
             }`}
           >
             <FaBlog /> Manage Blogs
+          </button>
+          <button
+            onClick={() => setActiveTab('analytics')}
+            className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl font-semibold transition-all duration-300 ${
+              activeTab === 'analytics'
+                ? 'bg-[#d2ab66] text-[#0a0a0a] shadow-md'
+                : 'text-gray-600 hover:bg-[#d2ab66]/5 hover:text-[#0a0a0a]'
+            }`}
+          >
+            <FaChartBar /> Analytics
           </button>
           <button
             onClick={() => setActiveTab('inquiries')}
@@ -439,7 +485,7 @@ function AdminSecure() {
                           value={blogDescTitle}
                           onChange={(e) => setBlogDescTitle(e.target.value)}
                           className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#d2ab66]/20 focus:border-[#d2ab66] resize-none"
-                          placeholder="A short subtitle or teaser for the article — appears below the title on the blog detail page"
+                          placeholder="A short subtitle or teaser for the article"
                         />
                       </div>
 
@@ -463,7 +509,7 @@ function AdminSecure() {
                             ))}
                           </div>
                         )}
-                        <p className="text-xs text-gray-400 mt-1">Used for search engine optimization — helps people find this post online</p>
+                        <p className="text-xs text-gray-400 mt-1">Used for search engine optimization</p>
                       </div>
                     </div>
 
@@ -651,6 +697,79 @@ function AdminSecure() {
                 )}
               </div>
             </>
+          ) : activeTab === 'analytics' ? (
+            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
+              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2 pb-3 border-b border-gray-100">
+                <FaChartBar className="text-[#d2ab66]" /> Analytics Dashboard
+              </h2>
+
+              {loading ? (
+                <div className="flex justify-center items-center py-16">
+                  <FaSpinner className="animate-spin text-[#d2ab66]" size={32} />
+                </div>
+              ) : blogs.length === 0 ? (
+                <div className="text-center py-12 bg-[#fafafa] rounded-2xl border border-dashed border-gray-200">
+                  <FaChartBar className="mx-auto text-4xl text-gray-300 mb-3" />
+                  <span className="block font-medium text-gray-600">No data yet</span>
+                  <span className="block text-sm text-gray-400 mt-1">Publish articles to see analytics</span>
+                </div>
+              ) : (
+                <div className="space-y-8">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="bg-[#0c0c0c] border border-[#d2ab66]/20 rounded-2xl p-6 text-center">
+                      <p className="text-gray-400 text-xs uppercase tracking-widest font-semibold">Total Articles</p>
+                      <p className="text-4xl font-extrabold text-[#d2ab66] mt-2">{blogs.length}</p>
+                    </div>
+                    <div className="bg-[#0c0c0c] border border-[#d2ab66]/20 rounded-2xl p-6 text-center">
+                      <p className="text-gray-400 text-xs uppercase tracking-widest font-semibold">Total Views</p>
+                      <p className="text-4xl font-extrabold text-[#d2ab66] mt-2">{analytics.totalViews}</p>
+                    </div>
+                    <div className="bg-[#0c0c0c] border border-[#d2ab66]/20 rounded-2xl p-6 text-center">
+                      <p className="text-gray-400 text-xs uppercase tracking-widest font-semibold">Total Likes</p>
+                      <p className="text-4xl font-extrabold text-[#d2ab66] mt-2">{analytics.totalLikes}</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#fafafa] rounded-2xl p-4 md:p-6 border border-gray-100">
+                    <h3 className="text-sm font-bold text-gray-700 mb-4 uppercase tracking-wider">Views per Article</h3>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart data={analytics.chartData} margin={{ top: 5, right: 20, left: 0, bottom: 60 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                        <XAxis dataKey="title" tick={{ fontSize: 11, fill: '#6b7280' }} angle={-25} textAnchor="end" height={70} />
+                        <YAxis tick={{ fontSize: 12, fill: '#6b7280' }} />
+                        <Tooltip
+                          contentStyle={{ borderRadius: '12px', border: '1px solid #d2ab66', fontSize: '13px' }}
+                          labelStyle={{ fontWeight: 'bold', color: '#0a0a0a' }}
+                        />
+                        <Bar dataKey="views" fill="#d2ab66" radius={[6, 6, 0, 0]} barSize={36} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <h3 className="text-sm font-bold text-gray-700 mb-4 uppercase tracking-wider">Per-Article Breakdown</h3>
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="border-b border-gray-100 text-gray-700 font-semibold text-sm">
+                          <th className="py-3 px-3">Article</th>
+                          <th className="py-3 px-3 text-center"><FaEye className="inline mr-1" size={12} />Views</th>
+                          <th className="py-3 px-3 text-center"><FaThumbsUp className="inline mr-1" size={11} />Likes</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-50 text-sm">
+                        {blogs.map((blog) => (
+                          <tr key={blog._id} className="hover:bg-[#fafafa] transition-colors">
+                            <td className="py-3 px-3 font-semibold text-gray-900 max-w-[280px] truncate">{blog.title}</td>
+                            <td className="py-3 px-3 text-center font-medium text-gray-700">{blog.views || 0}</td>
+                            <td className="py-3 px-3 text-center font-medium text-gray-700">{blog.likes || 0}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
           ) : (
             <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
               <h2 className="text-xl font-bold text-gray-900 mb-6 pb-3 border-b border-gray-100">Client Contact Inquiries</h2>

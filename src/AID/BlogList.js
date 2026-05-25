@@ -377,7 +377,7 @@ function BlogList() {
                         By {blog.byName || 'Admin'}
                       </span>
                       <span className="text-[8px] sm:text-[10px] text-gray-400 mt-0.5 font-medium whitespace-nowrap">
-                        {blog.views || 0} views • {blog.likes || 0} likes
+                        {blog.likes || 0} likes
                       </span>
                     </div>
                     <Link

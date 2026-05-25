@@ -115,12 +115,6 @@ function BlogDetail() {
               <FaClock className="text-[#d2ab66]" />
               {blog.readTime || '5 mins'}
             </span>
-            <span>•</span>
-            <span className="flex items-center gap-1 text-gray-400">
-              <FaEye className="text-[#d2ab66]" />
-              {blog.views || 0} views
-            </span>
-            <span>•</span>
             <span className="flex items-center gap-1 text-[#d2ab66] font-bold">
               <FaThumbsUp />
               {blog.likes || 0} likes
