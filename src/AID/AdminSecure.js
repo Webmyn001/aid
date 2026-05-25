@@ -4,7 +4,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import confetti from 'canvas-confetti';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { FaPlus, FaTrash, FaEdit, FaSignOutAlt, FaBlog, FaEnvelope, FaLock, FaImage, FaTag, FaUser, FaHeading, FaSearch, FaSpinner, FaEye, FaEyeSlash, FaChartBar, FaThumbsUp } from 'react-icons/fa';
+import { FaPlus, FaTrash, FaEdit, FaSignOutAlt, FaBlog, FaEnvelope, FaLock, FaImage, FaTag, FaUser, FaHeading, FaSearch, FaSpinner, FaEye, FaEyeSlash, FaChartBar, FaThumbsUp, FaShareAlt } from 'react-icons/fa';
 
 const API_BASE = 'https://aidconcept.vercel.app/api';
 
@@ -63,12 +63,14 @@ function AdminSecure() {
   const analytics = useMemo(() => {
     const totalViews = blogs.reduce((sum, b) => sum + (b.views || 0), 0);
     const totalLikes = blogs.reduce((sum, b) => sum + (b.likes || 0), 0);
+    const totalShares = blogs.reduce((sum, b) => sum + (b.shares || 0), 0);
     const chartData = blogs.map(b => ({
       title: b.title.length > 22 ? b.title.substring(0, 22) + '...' : b.title,
       views: b.views || 0,
       likes: b.likes || 0,
+      shares: b.shares || 0,
     })).sort((a, b) => b.views - a.views);
-    return { totalViews, totalLikes, chartData };
+    return { totalViews, totalLikes, totalShares, chartData };
   }, [blogs]);
 
   const fireConfetti = () => {
@@ -715,18 +717,22 @@ function AdminSecure() {
                 </div>
               ) : (
                 <div className="space-y-8">
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     <div className="bg-[#0c0c0c] border border-[#d2ab66]/20 rounded-2xl p-6 text-center">
                       <p className="text-gray-400 text-xs uppercase tracking-widest font-semibold">Total Articles</p>
-                      <p className="text-4xl font-extrabold text-[#d2ab66] mt-2">{blogs.length}</p>
+                      <p className="text-3xl sm:text-4xl font-extrabold text-[#d2ab66] mt-2">{blogs.length}</p>
                     </div>
                     <div className="bg-[#0c0c0c] border border-[#d2ab66]/20 rounded-2xl p-6 text-center">
                       <p className="text-gray-400 text-xs uppercase tracking-widest font-semibold">Total Views</p>
-                      <p className="text-4xl font-extrabold text-[#d2ab66] mt-2">{analytics.totalViews}</p>
+                      <p className="text-3xl sm:text-4xl font-extrabold text-[#d2ab66] mt-2">{analytics.totalViews}</p>
                     </div>
                     <div className="bg-[#0c0c0c] border border-[#d2ab66]/20 rounded-2xl p-6 text-center">
                       <p className="text-gray-400 text-xs uppercase tracking-widest font-semibold">Total Likes</p>
-                      <p className="text-4xl font-extrabold text-[#d2ab66] mt-2">{analytics.totalLikes}</p>
+                      <p className="text-3xl sm:text-4xl font-extrabold text-[#d2ab66] mt-2">{analytics.totalLikes}</p>
+                    </div>
+                    <div className="bg-[#0c0c0c] border border-[#d2ab66]/20 rounded-2xl p-6 text-center">
+                      <p className="text-gray-400 text-xs uppercase tracking-widest font-semibold">Total Shares</p>
+                      <p className="text-3xl sm:text-4xl font-extrabold text-[#d2ab66] mt-2">{analytics.totalShares}</p>
                     </div>
                   </div>
 
@@ -754,6 +760,7 @@ function AdminSecure() {
                           <th className="py-3 px-3">Article</th>
                           <th className="py-3 px-3 text-center"><FaEye className="inline mr-1" size={12} />Views</th>
                           <th className="py-3 px-3 text-center"><FaThumbsUp className="inline mr-1" size={11} />Likes</th>
+                          <th className="py-3 px-3 text-center"><FaShareAlt className="inline mr-1" size={11} />Shares</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-50 text-sm">
@@ -762,6 +769,7 @@ function AdminSecure() {
                             <td className="py-3 px-3 font-semibold text-gray-900 max-w-[280px] truncate">{blog.title}</td>
                             <td className="py-3 px-3 text-center font-medium text-gray-700">{blog.views || 0}</td>
                             <td className="py-3 px-3 text-center font-medium text-gray-700">{blog.likes || 0}</td>
+                            <td className="py-3 px-3 text-center font-medium text-gray-700">{blog.shares || 0}</td>
                           </tr>
                         ))}
                       </tbody>

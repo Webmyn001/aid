@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, Link } from 'react-router-dom';
 import { 
-  FaCalendarAlt, FaTag, FaArrowLeft, FaClock, FaEye, FaThumbsUp, 
+  FaCalendarAlt, FaTag, FaArrowLeft, FaClock, FaThumbsUp, FaThumbsDown,
   FaShareAlt, FaWhatsapp, FaTwitter, FaFacebookF, FaLinkedinIn, FaCopy, FaCheck 
 } from 'react-icons/fa';
 import { MOCK_BLOGS } from './BlogList';
@@ -15,13 +15,38 @@ function BlogDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
+  const [liking, setLiking] = useState(false);
 
   const shareUrl = `${API_BASE}/blogs/share/${id}`;
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareUrl);
     setCopied(true);
+    trackShare();
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleLike = async () => {
+    if (liking) return;
+    setLiking(true);
+    try {
+      const res = await axios.put(`${API_BASE}/blogs/${id}/like`);
+      if (res.data.success) {
+        setBlog(prev => ({ ...prev, likes: res.data.likes }));
+      }
+    } catch (err) {
+      console.warn('Like failed:', err.message);
+    } finally {
+      setLiking(false);
+    }
+  };
+
+  const trackShare = async () => {
+    try {
+      await axios.put(`${API_BASE}/blogs/${id}/share`);
+    } catch (err) {
+      // silently fail
+    }
   };
 
   useEffect(() => {
@@ -115,10 +140,14 @@ function BlogDetail() {
               <FaClock className="text-[#d2ab66]" />
               {blog.readTime || '5 mins'}
             </span>
-            <span className="flex items-center gap-1 text-[#d2ab66] font-bold">
-              <FaThumbsUp />
+            <button
+              onClick={handleLike}
+              disabled={liking}
+              className="flex items-center gap-1.5 text-[#d2ab66] font-bold hover:text-[#b73034] transition-colors disabled:opacity-60"
+            >
+              {liking ? <FaThumbsDown className="animate-pulse" size={14} /> : <FaThumbsUp size={14} />}
               {blog.likes || 0} likes
-            </span>
+            </button>
             <span className="hidden sm:inline">•</span>
             <span className="uppercase tracking-widest text-[10px] font-bold text-gray-400">By {blog.byName || 'Admin'}</span>
           </div>
@@ -183,6 +212,7 @@ function BlogDetail() {
               href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out this article: "${blog.title}"\n${shareUrl}`)}`}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={trackShare}
               className="w-10 h-10 rounded-full bg-white hover:bg-emerald-500 text-[#d2ab66] hover:text-white border border-[#d2ab66]/20 flex justify-center items-center transition-all duration-300 shadow-sm cursor-pointer"
               title="Share on WhatsApp"
             >
@@ -194,6 +224,7 @@ function BlogDetail() {
               href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(`Check out this article: "${blog.title}"`)}`}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={trackShare}
               className="w-10 h-10 rounded-full bg-white hover:bg-black text-[#d2ab66] hover:text-white border border-[#d2ab66]/20 flex justify-center items-center transition-all duration-300 shadow-sm cursor-pointer"
               title="Share on X (Twitter)"
             >
@@ -205,6 +236,7 @@ function BlogDetail() {
               href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={trackShare}
               className="w-10 h-10 rounded-full bg-white hover:bg-blue-600 text-[#d2ab66] hover:text-white border border-[#d2ab66]/20 flex justify-center items-center transition-all duration-300 shadow-sm cursor-pointer"
               title="Share on Facebook"
             >
@@ -216,6 +248,7 @@ function BlogDetail() {
               href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={trackShare}
               className="w-10 h-10 rounded-full bg-white hover:bg-sky-700 text-[#d2ab66] hover:text-white border border-[#d2ab66]/20 flex justify-center items-center transition-all duration-300 shadow-sm cursor-pointer"
               title="Share on LinkedIn"
             >

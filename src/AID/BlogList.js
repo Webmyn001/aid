@@ -20,7 +20,8 @@ const MOCK_BLOGS = [
     readTime: "4 mins",
     createdAt: "2026-05-18T10:00:00.000Z",
     views: 145,
-    likes: 42
+    likes: 42,
+    shares: 18
   },
   {
     _id: 'mock-2',
@@ -36,7 +37,8 @@ const MOCK_BLOGS = [
     readTime: "6 mins",
     createdAt: "2026-05-18T12:00:00.000Z",
     views: 210,
-    likes: 68
+    likes: 68,
+    shares: 35
   },
   {
     _id: 'mock-3',
@@ -52,7 +54,8 @@ const MOCK_BLOGS = [
     readTime: "5 mins",
     createdAt: "2026-05-18T08:00:00.000Z",
     views: 98,
-    likes: 31
+    likes: 31,
+    shares: 12
   }
 ];
 
